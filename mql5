@@ -1,0 +1,72 @@
+
+//+------------------------------------------------------------------+
+//|                                                     Royal Scalping Indicator M5 |
+//|                                    Developed by Forex Robot Easy Team |
+//|                                                   forexroboteasy.com |
+//+------------------------------------------------------------------+
+
+#property copyright 'Forex Robot Easy Team'
+#property link      'forexroboteasy.com'
+
+//+------------------------------------------------------------------+
+//|                                      Indicator input parameters |
+//+------------------------------------------------------------------+
+input int OscillatorPeriod = 14;   // Oscillator period
+input int TrendPeriod = 20;        // Trend period
+input int SignalPeriod = 9;        // Signal period
+
+input ENUM_TIMEFRAMES Timeframe = PERIOD_M5;  // Default timeframe
+input string Symbol = 'EURUSD';               // Default symbol
+
+//+------------------------------------------------------------------+
+//|                                               Indicator buffers |
+//+------------------------------------------------------------------+
+double OscillatorBuffer[];
+double TrendBuffer[];
+double SignalBuffer[];
+
+//+------------------------------------------------------------------+
+//|                                                Indicator init |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+   SetIndexStyle(0, DRAW_LINE);
+   SetIndexBuffer(0, OscillatorBuffer);
+   SetIndexLabel(0, 'Oscillator');
+
+   SetIndexStyle(1, DRAW_LINE);
+   SetIndexBuffer(1, TrendBuffer);
+   SetIndexLabel(1, 'Trend');
+
+   SetIndexStyle(2, DRAW_LINE);
+   SetIndexBuffer(2, SignalBuffer);
+   SetIndexLabel(2, 'Signal');
+
+   return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//|                                                  Indicator start |
+//+------------------------------------------------------------------+
+int OnCalculate(const int rates_total,
+                const int prev_calculated,
+                const datetime &time[],
+                const double &open[],
+                const double &high[],
+                const double &low[],
+                const double &close[],
+                const long &tick_volume[],
+                const long &volume[],
+                const int &spread[])
+{
+   int limit = MathMin(rates_total, prev_calculated);
+
+   for (int i = limit; i < rates_total; i++)
+   {
+      OscillatorBuffer[i] = iCustom(Symbol, Timeframe, 'Oscillator', OscillatorPeriod, i);
+      TrendBuffer[i] = iCustom(Symbol, Timeframe, 'Trend', TrendPeriod, i);
+      SignalBuffer[i] = iCustom(Symbol, Timeframe, 'Signal', SignalPeriod, i);
+   }
+
+   return(rates_total);
+}
